@@ -1,0 +1,45 @@
+# Build Stage
+FROM golang:1.23-alpine AS builder
+
+WORKDIR /app
+
+# Install build dependencies
+RUN apk add --no-cache gcc musl-dev
+
+# Copy module files and download dependencies
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copy source code
+COPY . .
+
+# Build the binary
+# -ldflags="-w -s" reduces binary size by stripping debug symbols
+RUN CGO_ENABLED=1 GOOS=linux go build -ldflags="-w -s" -o main cmd/api/main.go
+
+# Runtime Stage
+FROM alpine:latest
+
+WORKDIR /app
+
+# Install runtime dependencies (sqlite needs libc)
+RUN apk add --no-cache ca-certificates sqlite
+
+# Copy binary from builder
+COPY --from=builder /app/main .
+
+# Create directory for data persistence
+# This will be mounted as a volume
+RUN mkdir -p /app/data/uploads
+
+# Set environment variables
+ENV PORT=8080
+ENV APP_ENV=production
+ENV BLUEPRINT_DB_URL=/app/data/finance.db
+ENV FILES_DB_URL=/app/data/files.db
+
+# Expose port
+EXPOSE 8080
+
+# Run the application
+CMD ["./main"]

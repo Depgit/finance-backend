@@ -1,0 +1,48 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: finance-backend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - PORT=8080
+      - DB_URL=postgres://postgres:postgres@postgres:5432/finance?sslmode=disable
+      - JWT_SECRET=${JWT_SECRET:-drpzet}
+      - JWT_ISSUER=${JWT_ISSUER:-finance-manage}
+      - ADMIN_EMAIL=${ADMIN_EMAIL:-depcoder@gmail.com}
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: finance-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: finance
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # frontend:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.frontend
+  #   container_name: finance-frontend
+  #   restart: unless-stopped
+  #   ports:
+  #     - "80:80"
+  #   depends_on:
+  #     - backend
+
+# Optional: named volumes if you prefer not to bind mount host directory
+volumes:
+  postgres_data:
+
