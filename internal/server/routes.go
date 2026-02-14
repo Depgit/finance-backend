@@ -2,6 +2,7 @@ package server
 
 import (
 	"net/http"
+	"os"
 
 	"finance-manage/internal/handlers"
 
@@ -12,8 +13,14 @@ import (
 func (s *Server) RegisterRoutes() http.Handler {
 	r := gin.Default()
 
+	clientURL := os.Getenv("CLIENT_URL")
+	allowOrigins := []string{"http://localhost:5173", "http://localhost:5174"}
+	if clientURL != "" {
+		allowOrigins = append(allowOrigins, clientURL)
+	}
+
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:5173", "http://localhost:5174"}, // Frontend URLs
+		AllowOrigins:     allowOrigins,
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
 		AllowHeaders:     []string{"Accept", "Authorization", "Content-Type"},
 		AllowCredentials: true, // Enable cookies/auth

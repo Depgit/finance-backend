@@ -31,7 +31,7 @@ type service struct {
 }
 
 var (
-	dburl           = os.Getenv("DB_URL")
+	dburl           = os.Getenv("BLUEPRINT_DB_URL")
 	dbInstance      *service
 	filesDbInstance *service
 )
@@ -43,7 +43,8 @@ func New() Service {
 	}
 
 	if dburl == "" {
-		dburl = "postgres://postgres:postgres@localhost:5432/finance?sslmode=disable"
+		log.Println("No database URL found. Using default database URL.")
+		// dburl = "postgres://postgres:postgres@localhost:5432/finance?sslmode=disable"
 	}
 
 	db, err := sql.Open("postgres", dburl)
@@ -65,7 +66,7 @@ func NewFiles() Service {
 	}
 
 	if dburl == "" {
-		dburl = "postgres://postgres:postgres@localhost:5432/finance?sslmode=disable"
+		// dburl = "postgres://postgres:postgres@localhost:5432/finance?sslmode=disable"
 	}
 
 	db, err := sql.Open("postgres", dburl)
