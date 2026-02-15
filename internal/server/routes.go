@@ -14,7 +14,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r := gin.Default()
 
 	clientURL := os.Getenv("CLIENT_URL")
-	allowOrigins := []string{"http://localhost:5173", "http://localhost:5174"}
+	allowOrigins := []string{"http://localhost:5173", "http://localhost:5174", "https://saltstyzledger.netlify.app"}
 	if clientURL != "" {
 		allowOrigins = append(allowOrigins, clientURL)
 	}
