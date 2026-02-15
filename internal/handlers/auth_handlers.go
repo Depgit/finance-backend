@@ -33,6 +33,7 @@ func RegisterAuthRoutes(rg *gin.Engine) {
 type registerReq struct {
 	Email    string `json:"email" binding:"required,email"`
 	Password string `json:"password" binding:"required,min=6"`
+	Role     string `json:"role" binding:"required"`
 }
 
 func registerHandler(c *gin.Context) {
@@ -43,7 +44,7 @@ func registerHandler(c *gin.Context) {
 	}
 	// FORCE ROLE TO EMPLOYEE
 	// Security: Prevent users from registering as ADMIN/Manager directly
-	role := auth.RoleEmployee
+	role := req.Role
 
 	svc := database.New()
 	db := svc.DB()
